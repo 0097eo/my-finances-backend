@@ -77,20 +77,20 @@ class Profile(Resource):
             return {"error": str(e)}, 422
     
 class TransactionResource(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         try:
             user_id = get_jwt_identity()
             transactions = Transaction.query.filter_by(user_id=user_id).all()
-            return jsonify([{
+            return [{
                 "id": t.id,
                 "user_id": t.user_id,
-                "budget_category_id": t.budget,
-                "created_at": t.created_at,
+                "budget_category_id": t.budget_category_id,
+                "created_at": t.created_at.isoformat(),
                 "amount": t.amount,
                 "description": t.description,
                 "type": t.type
-                }for t in transactions])
+            } for t in transactions], 200
         except Exception as e:
             return {"error": str(e)}, 500
     
