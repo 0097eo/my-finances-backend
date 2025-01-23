@@ -2,7 +2,6 @@ from config import app, db, api
 from models import User, Transaction, BudgetCategory, Budget
 from flask_restful import Resource, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from flask import jsonify
 from sqlalchemy.exc import IntegrityError
 
 class Register(Resource):
@@ -94,7 +93,7 @@ class TransactionResource(Resource):
         except Exception as e:
             return {"error": str(e)}, 500
     
-    @jwt_required
+    @jwt_required()
     def post(self):
         try:
             user_id = get_jwt_identity()
@@ -127,7 +126,7 @@ class TransactionResource(Resource):
             return {"error": str(e)}, 500
         
 
-    @jwt_required
+    @jwt_required()
     def delete(self, transaction_id):
         try:
             user_id = get_jwt_identity()
@@ -147,12 +146,12 @@ class TransactionResource(Resource):
             return {"error": str(e)}, 500
         
 class BudgetResource(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         try:
             user_id = get_jwt_identity()
             budgets = Budget.query.filter_by(user_id=user_id).all()
-            return jsonify([{
+            return [{
                 'id': b.id,
                 'name': b.name,
                 'amount': float(b.amount),
@@ -162,9 +161,8 @@ class BudgetResource(Resource):
                     'name': cat.name,
                     'allocated_amount': float(cat.alocated_amount),
                     'color': cat.color
-                    } for cat in b.categories]
-            } for b in budgets])
-        
+                } for cat in b.categories]
+            } for b in budgets], 200
         except Exception as e:
             return {"error": str(e)}, 500
         
