@@ -48,7 +48,7 @@ class Login(Resource):
             if not user or not user.check_password(data["password"]):
                 return {"error": "Invalid email or password"}, 400
             
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
 
             return {
                 "message": "Login successful",
@@ -61,20 +61,20 @@ class Login(Resource):
         
 
 class Profile(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         try:
             current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
+            user = User.query.get_or_404(current_user_id)
 
             return {
                 "id": user.id,
                 "name": user.name,
                 "email": user.email
-            }
+            }, 200 
         
         except Exception as e:
-            return {"error": str(e)}, 500
+            return {"error": str(e)}, 422
     
 class TransactionResource(Resource):
     @jwt_required
