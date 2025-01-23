@@ -132,8 +132,8 @@ class TransactionResource(Resource):
             user_id = get_jwt_identity()
             transaction = Transaction.query.get(transaction_id)
             if not transaction:
-                return {"error": "Transaction does not exist"}, 400
-            if transaction.user_id != user_id:
+                return {"error": "Transaction does not exist"}, 404
+            if transaction.user_id != int(user_id):
                 return {"error": "Unauthorized"}, 401
 
             db.session.delete(transaction)
